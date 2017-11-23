@@ -6,6 +6,7 @@ import { Ingredient } from './ingredient.model';
 
 export class Recipe {
 
+    public _id
     public name: string;
     public description: string;
     public imagePath: string;
