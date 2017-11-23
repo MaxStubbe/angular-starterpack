@@ -4,13 +4,16 @@ import { environment } from '../../environments/environment';
 import { Router, ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/toPromise';
 import { Observable } from 'rxjs/Observable';
+
 import { Recipe } from '../models/recipe.model';
+import { Ingredient } from '../models/ingredient.model';
 
 @Injectable()
 export class RecipeService {
 
   private headers = new Headers({ 'Content-Type': 'application/json' });
   private serverUrl = environment.serverUrl + '/recipes'; // URL to web api
+  private ingredientsUrl = environment.serverUrl + '/shopping-list'; //URL naar ingredients
   private recipes: Recipe[] = [];
 
   //
@@ -34,9 +37,9 @@ export class RecipeService {
       });
   }
 
-  public getRecipe(id:String):Promise<Recipe> {
+  public getRecipe(id: String):Promise<Recipe> {
       console.log('recipe ophalen met id');
-      return this.http.get(this.serverUrl+ '/' + id, { headers: this.headers })
+      return this.http.get(this.serverUrl + '/' + id, { headers: this.headers })
         .toPromise()
         .then(response => {
             console.dir(response.json());
@@ -45,6 +48,18 @@ export class RecipeService {
         .catch( error => {
             return this.handleError(error);
         });
+  }
+
+  public addIngredientsToShoppingList(recipe: Recipe){
+    console.log("voeg ingredienten toe");
+    recipe.ingredients.forEach(ingredient => {
+      this.http.post(this.ingredientsUrl, { name: ingredient.name, amount: ingredient.amount })
+      .toPromise()
+      .then( () =>
+        console.log("ingredient toegevoegd")
+      )
+      .catch( error => { return this.handleError(error) } );
+    });
   }
 
   //

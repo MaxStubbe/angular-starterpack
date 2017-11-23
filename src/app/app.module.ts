@@ -12,7 +12,7 @@ import { ShoppingListComponent } from './components/shopping-list/shopping-list.
 import { ShoppingEditComponent } from './components/shopping-list/shopping-edit/shopping-edit.component';
 
 import { DropdownDirective } from './components/shared/dropdown.directive';
-import { ShoppingListService } from './components/shopping-list/shopping-list.service';
+import { ShoppingListService } from './services/shopping-list.service';
 import { RecipeService } from './services/recipe.service';
 
 import { AppRoutingModule } from './app-routing.module';

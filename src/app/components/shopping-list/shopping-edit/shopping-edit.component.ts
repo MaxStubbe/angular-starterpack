@@ -5,8 +5,8 @@ import {
   ViewChild
 } from '@angular/core';
 
-import { Ingredient } from '../../shared/ingredient.model';
-import { ShoppingListService } from '../shopping-list.service';
+import { Ingredient } from '../../../models/ingredient.model';
+import { ShoppingListService } from '../../../services/shopping-list.service';
 
 @Component({
   selector: 'app-shopping-edit',

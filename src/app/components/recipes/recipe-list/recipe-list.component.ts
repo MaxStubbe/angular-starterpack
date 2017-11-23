@@ -19,8 +19,8 @@ export class RecipeListComponent implements OnInit {
 
   ngOnInit(): void {
     this.recipeService.getRecipes()
-    .then(recipes => this.recipes = recipes)
-    .catch(error => console.log(error));
+      .then(recipes => this.recipes = recipes)
+      .catch(error => console.log(error));
   }
 
   onNewRecipe(){

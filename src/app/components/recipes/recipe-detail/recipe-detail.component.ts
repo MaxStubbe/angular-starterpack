@@ -10,7 +10,7 @@ import { ActivatedRoute,Router, Params } from '@angular/router';
   styleUrls: ['./recipe-detail.component.css']
 })
 export class RecipeDetailComponent implements OnInit {
-  recipe: Promise<Recipe>;
+  recipe: Recipe;
   id: String;
 
   constructor(private recipeService: RecipeService,
@@ -23,13 +23,15 @@ export class RecipeDetailComponent implements OnInit {
       .subscribe(
         (params: Params) => {
           this.id = params['id'];
-          this.recipe = this.recipeService.getRecipe(this.id);
+          this.recipeService.getRecipe(this.id)
+            .then(recipe => this.recipe = recipe)
+            .catch(error => console.log(error));
         }
       );
   }
 
   onAddToShoppingList() {
-    //this.recipeService.addIngredientsToShoppingList(this.recipe.ingredients);
+    this.recipeService.addIngredientsToShoppingList(this.recipe);
   }
 
   onEditRecipe(){
