@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { Router, ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/toPromise';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { Recipe } from '../models/recipe.model';
 import { Ingredient } from '../models/ingredient.model';
@@ -15,6 +16,8 @@ export class RecipeService {
   private serverUrl = environment.serverUrl + '/recipes'; // URL to web api
   private ingredientsUrl = environment.serverUrl + '/shopping-list'; //URL naar ingredients
   private recipes: Recipe[] = [];
+
+  recipesChanged = new Subject<Recipe[]>();
 
   //
   //
@@ -30,16 +33,17 @@ export class RecipeService {
       .toPromise()
       .then(response => {
         console.dir(response.json());
-        return response.json() as Recipe[];
+        this.recipes = response.json() as Recipe[];
+        return this.recipes;
       })
       .catch(error => {
         return this.handleError(error);
       });
   }
 
-  public getRecipe(id: String):Promise<Recipe> {
+  public getRecipe(index: number):Promise<Recipe> {
       console.log('recipe ophalen met id');
-      return this.http.get(this.serverUrl + '/' + id, { headers: this.headers })
+      return this.http.get(this.serverUrl + '/' + this.recipes[index]._id, { headers: this.headers })
         .toPromise()
         .then(response => {
             console.dir(response.json());
@@ -49,6 +53,66 @@ export class RecipeService {
             return this.handleError(error);
         });
   }
+
+  public addRecipe(recipe: Recipe) {
+    console.log('recipe opslaan');
+    this.http.post(this.serverUrl, { name: recipe.name, description: recipe.description, imagePath: recipe.imagePath, ingredients: recipe.ingredients})
+      .toPromise()
+      .then( () =>{
+        console.log("recipe toegevoegd")
+        this.getRecipes()
+        .then(
+          recipes => {
+            this.recipes = recipes
+            this.recipesChanged.next(this.recipes.slice());
+          }
+        )
+        .catch(error => console.log(error));
+      }
+      )
+      .catch( error => { return this.handleError(error) } );
+      
+      
+  }
+
+  public updateRecipe(index: number, newRecipe : Recipe){
+    console.log("recipe updaten");
+    
+    this.http.put(this.serverUrl + "/" + this.recipes[index]._id, { name: newRecipe.name, description: newRecipe.description, imagePath: newRecipe.imagePath, ingredients: newRecipe.ingredients})
+      .toPromise()
+      .then( () => {
+        console.log("recipe veranderd")
+        this.getRecipes()
+        .then(
+          recipes => {
+            this.recipes = recipes
+            this.recipesChanged.next(this.recipes.slice());
+          }
+        )
+        .catch(error => console.log(error));
+    })
+      .catch( error => { return this.handleError(error) } );
+  }
+
+  public deleteRecipe(index: number){
+    console.log("recipe updaten");
+    
+    this.http.delete(this.serverUrl + "/" + this.recipes[index]._id)
+      .toPromise()
+      .then( () => {
+        console.log("recipe verwijderd")
+        this.getRecipes()
+        .then(
+          recipes => {
+            this.recipes = recipes
+            this.recipesChanged.next(this.recipes.slice());
+          }
+        )
+        .catch(error => console.log(error));
+    })
+      .catch( error => { return this.handleError(error) } );
+  }
+
 
   public addIngredientsToShoppingList(recipe: Recipe){
     console.log("voeg ingredienten toe");
